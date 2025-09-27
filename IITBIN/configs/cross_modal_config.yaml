@@ -1,0 +1,89 @@
+# Configuration for cross-modal knowledge transfer
+
+# Data configuration
+data:
+  data_path: "data/"
+  modalities: ["eeg", "eye_tracking", "gsr"]
+  target_modality: "eeg"
+  batch_size: 16
+  num_workers: 4
+  train_split: 0.7
+  val_split: 0.15
+  test_split: 0.15
+
+# Model configuration
+model:
+  type: "multi_modal"
+  eeg_channels: 64
+  eye_tracking_features: 4
+  gsr_channels: 1
+  sequence_length: 1000
+  hidden_dim: 256
+  num_classes: 2
+  fusion_method: "cross_attention"
+  use_domain_adaptation: true
+  modality_dropout: true
+  dropout_prob: 0.2
+
+# Training configuration
+training:
+  num_epochs: 150
+  learning_rate: 5e-4
+  optimizer: "adamw"
+  weight_decay: 1e-4
+  momentum: 0.9
+  grad_clip_norm: 1.0
+  
+  # Loss weights
+  classification_weight: 1.0
+  consistency_weight: 0.2
+  alignment_weight: 0.1
+  
+  # Callbacks
+  early_stopping_patience: 15
+  lr_patience: 8
+  monitor_metric: "val_total_loss"
+  
+  # Checkpointing
+  checkpoint_path: "results/checkpoints/best_cross_modal_model.pth"
+  save_frequency: 10
+
+# Domain adaptation configuration
+domain_adaptation:
+  enabled: true
+  source_modality: "eeg"
+  target_modality: "eye_tracking"
+  adaptation_method: "mlp"
+  task_weight: 1.0
+  domain_weight: 0.1
+  adversarial_weight: 0.1
+
+# Contrastive learning configuration
+contrastive_learning:
+  enabled: true
+  temperature: 0.07
+  projection_dim: 128
+  contrastive_weight: 0.5
+
+# Evaluation configuration
+evaluation:
+  metrics: ["accuracy", "precision", "recall", "f1_score", "roc_auc"]
+  save_predictions: true
+  save_features: true
+  visualization: true
+
+# Logging configuration
+logging:
+  log_dir: "results/logs/"
+  log_frequency: 10
+  save_plots: true
+  use_wandb: false
+  wandb_project: "cross-modal-transfer"
+
+# Device configuration
+device:
+  use_cuda: true
+  device_id: 0
+
+# Reproducibility
+seed: 42
